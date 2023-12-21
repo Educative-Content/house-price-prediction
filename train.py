@@ -59,7 +59,7 @@ def buildModel():
 bucket_name = os.environ.get('BUCKET_NAME')
 file = os.environ.get('FILE_NAME')
 # Load our dataset
-data = fetch_documents_from_s3()
+data = fetch_documents_from_s3(bucket_name, file)
 X_train, X_test, y_train, y_test = splitData(data)
 scaler, scaler_y, X_train, X_test, y_train, y_test = scaleData(X_train, X_test, y_train, y_test)
 model = buildModel()
