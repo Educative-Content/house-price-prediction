@@ -56,8 +56,11 @@ def buildModel():
 
 
 
+files = ['part1.csv','part2.csv','part3.csv']
 bucket_name = os.environ.get('BUCKET_NAME')
-file = os.environ.get('FILE_NAME')
+array_index = int(os.environ.get('AWS_BATCH_JOB_ARRAY_INDEX', 0))
+file= files[array_index]
+
 # Load our dataset
 data = fetch_documents_from_s3(bucket_name, file)
 X_train, X_test, y_train, y_test = splitData(data)
