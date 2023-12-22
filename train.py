@@ -14,6 +14,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 s3 = boto3.client('s3')
+print("s3 client created: ",s3)
 
 def fetch_documents_from_s3(bucket_name, file=''):
     response = s3.get_object(Bucket=bucket_name, Key=file)
@@ -57,9 +58,12 @@ def buildModel():
 
 
 files = ['part1.csv','part2.csv','part3.csv']
+print("I made it beyond the files line!")
 bucket_name = os.environ.get('BUCKET_NAME')
 array_index = int(os.environ.get('AWS_BATCH_JOB_ARRAY_INDEX', 0))
+print("I made it beyond the farray_index line!")
 file= files[array_index]
+print("I made it beyond the file line!")
 
 # Load our dataset
 data = fetch_documents_from_s3(bucket_name, file)
