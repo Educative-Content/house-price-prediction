@@ -10,7 +10,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install TensorFlow
-RUN pip install --no-cache-dir tensorflow-gpu
+RUN pip install --no-cache-dir tensorflow
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
