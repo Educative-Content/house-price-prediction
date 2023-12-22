@@ -13,8 +13,6 @@ from sklearn.datasets import load_iris
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
-print(tf.test.is_built_with_tensorrt())
-
 s3 = boto3.client('s3')
 
 def fetch_documents_from_s3(bucket_name, file=''):
