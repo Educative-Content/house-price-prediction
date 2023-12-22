@@ -3,4 +3,3 @@ scipy
 numpy
 pandas
 boto3
-tensorrt
