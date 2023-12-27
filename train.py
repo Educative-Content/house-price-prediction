@@ -14,6 +14,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 
+
 s3 = boto3.client('s3')
 def fetch_documents_from_s3(bucket_name, file=''):
     response = s3.get_object(Bucket=bucket_name, Key=file)
@@ -88,11 +89,13 @@ def main():
     # predicted_val = predictions
     print(f'Actual: {actual_val}, Predicted: {predicted_val}')
 
+    file_name=f'weights{array_index}.npy'
+
     model_weights = model.get_weights()
-    file_name = f'weights{array_index}.npy'
-    np.save(file_name,model_weights)
-    s3.upload_file(file_name, bucket_name, file_name)
+    np.save(file_name,np.array(model_weights, dtype=object))
+    s3.upload_file(file_name,bucket_name,file_name)
+    
     
 
 main()
-print('The model has been trained and weights have been uploaded to s3')
+print('Model has been trained and the weights have been uploaded to the s3 bucket')
