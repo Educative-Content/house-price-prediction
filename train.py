@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import load_iris
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+import joblib
 
 
 
@@ -86,16 +87,23 @@ def main():
     actual_val = scaler_y.inverse_transform(y_test[0].reshape(-1,1))[0][0]
     predictions = model.predict(X_test)
     predicted_val = scaler_y.inverse_transform(predictions[0].reshape(-1,1))[0][0]
-    # predicted_val = predictions
     print(f'Actual: {actual_val}, Predicted: {predicted_val}')
 
     file_name=f'weights{array_index}.npy'
 
+    #saving model weights
     model_weights = model.get_weights()
     np.save(file_name,np.array(model_weights, dtype=object))
-    s3.upload_file(file_name,bucket_name,file_name)
+
+    joblib.dump(scaler,'scaler.pkl')
+    joblib.dump(scaler_y,'scaler_y.pkl')
+
+    exports = ['scaler.pkl', 'scaler_y.pkl', file_name]
+    for files in exports:
+        print(f'Uploaded {files} to {bucket_name}')
+        s3.upload_file(files,bucket_name,files)
     
     
 
 main()
-print('Model has been trained and the weights have been uploaded to the s3 bucket')
+print('Model has been trained!')
