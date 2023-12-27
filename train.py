@@ -91,17 +91,25 @@ def main():
 
     file_name=f'weights{array_index}.npy'
 
-    #saving model weights
+    # Saving model weights
     model_weights = model.get_weights()
     np.save(file_name,np.array(model_weights, dtype=object))
 
+    # Saving the model
+    model.save('model.h5')    
+
+    # Saving scalers
     joblib.dump(scaler,'scaler.pkl')
     joblib.dump(scaler_y,'scaler_y.pkl')
 
-    exports = ['scaler.pkl', 'scaler_y.pkl', file_name]
-    for files in exports:
-        print(f'Uploaded {files} to {bucket_name}')
-        s3.upload_file(files,bucket_name,files)
+    exports = ['scaler.pkl', 'scaler_y.pkl', 'model.h5', file_name]
+    for index,files in enumerate(exports):
+        if index == 3:
+            print(f'Uploaded {files} to {bucket_name}')
+            s3.upload_file(files,bucket_name,files)
+        else:
+            print(f'Uploaded {files} to {bucket_name}/weights')
+            s3.upload_file(files,bucket_name,f'./weights/{files}')
     
     
 
