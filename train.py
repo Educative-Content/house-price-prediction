@@ -13,9 +13,8 @@ from sklearn.datasets import load_iris
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
-s3 = boto3.client('s3')
-print("s3 client created: ",s3)
 
+s3 = boto3.client('s3')
 def fetch_documents_from_s3(bucket_name, file=''):
     response = s3.get_object(Bucket=bucket_name, Key=file)
     file = response['Body'].read()
@@ -56,34 +55,44 @@ def buildModel():
     return model
 
 
-
-files = ['part1.csv','part2.csv','part3.csv']
-print("I made it beyond the files line!")
-bucket_name = os.environ.get('BUCKET_NAME')
-array_index = int(os.environ.get('AWS_BATCH_JOB_ARRAY_INDEX', 0))
-print("I made it beyond the farray_index line!")
-file= files[array_index]
-print("I made it beyond the file line!")
-
-# Load our dataset
-data = fetch_documents_from_s3(bucket_name, file)
-X_train, X_test, y_train, y_test = splitData(data)
-scaler, scaler_y, X_train, X_test, y_train, y_test = scaleData(X_train, X_test, y_train, y_test)
-model = buildModel()
+def main():
+    files = ['part1.csv','part2.csv','part3.csv']
+    bucket_name = os.environ.get('BUCKET_NAME')
+    print("Bucket:",bucket_name)
+    array_index = int(os.environ.get('AWS_BATCH_JOB_ARRAY_INDEX', 0))
+    file= files[array_index]
+    print(f"Job no {array_index} starting!")
+    print(f"Training on {file}")
 
 
-# Train the model
-start = time.time()
-model.fit(X_train, y_train, epochs=500, batch_size=32, validation_data=(X_test, y_test))
-end = time.time()
+    # Load our dataset
+    data = fetch_documents_from_s3(bucket_name, file)
+    X_train, X_test, y_train, y_test = splitData(data)
+    scaler, scaler_y, X_train, X_test, y_train, y_test = scaleData(X_train, X_test, y_train, y_test)
+    model = buildModel()
 
-# Evaluate the model on the test set
-loss = model.evaluate(X_test, y_test)
-print(f'Final Loss: {loss}')
-print(f'Time taken: {end - start}s')
 
-actual_val = scaler_y.inverse_transform(y_test[0].reshape(-1,1))[0][0]
-predictions = model.predict(X_test)
-predicted_val = scaler_y.inverse_transform(predictions[0].reshape(-1,1))[0][0]
-# predicted_val = predictions
-print(f'Actual: {actual_val}, Predicted: {predicted_val}')
+    # Train the model
+    start = time.time()
+    model.fit(X_train, y_train, epochs=500, batch_size=32, validation_data=(X_test, y_test))
+    end = time.time()
+
+    # Evaluate the model on the test set
+    loss = model.evaluate(X_test, y_test)
+    print(f'Final Loss: {loss}')
+    print(f'Time taken: {end - start}s')
+
+    actual_val = scaler_y.inverse_transform(y_test[0].reshape(-1,1))[0][0]
+    predictions = model.predict(X_test)
+    predicted_val = scaler_y.inverse_transform(predictions[0].reshape(-1,1))[0][0]
+    # predicted_val = predictions
+    print(f'Actual: {actual_val}, Predicted: {predicted_val}')
+
+    model_weights = model.get_weights()
+    file_name = f'weights{array_index}.npy'
+    np.save(file_name,model_weights)
+    s3.upload_file(file_name, bucket_name, file_name)
+    
+
+main()
+print('The model has been trained and weights have been uploaded to s3')
