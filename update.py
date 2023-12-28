@@ -1,6 +1,6 @@
 # Import necessary libraries
 import boto3
-import joblib
+import os
 from io import BytesIO
 import numpy as np
 import pandas as pd
