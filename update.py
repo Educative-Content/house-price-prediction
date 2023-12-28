@@ -20,12 +20,10 @@ def getModel(key):
 
 
 
-# bucket_name = os.environ.get('BUCKET_NAME')
-bucket_name = 'test-adeel1'
+bucket_name = os.environ.get('BUCKET_NAME')
 weights_key = ["weights0.npy","weights1.npy","weights2.npy"]
 
-s3 = boto3.client('s3',aws_access_key_id="AKIAWPDSNEQ5ZOGUJYJI", aws_secret_access_key="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", region_name="us-east-1")
-# s3 = boto3.client('s3')
+s3 = boto3.client('s3')
 new_weights = []
 for index, weight in enumerate(weights_key):
     response = s3.get_object(Bucket=bucket_name, Key=f"weights/{weight}")
