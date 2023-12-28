@@ -105,11 +105,11 @@ def main():
     exports = ['scaler.pkl', 'scaler_y.pkl', 'model.h5', file_name]
     for index,files in enumerate(exports):
         if index == 3:
-            print(f'Uploaded {files} to {bucket_name}')
-            s3.upload_file(files,bucket_name,files)
-        else:
+            s3.upload_file(files,bucket_name,f'weights/{files}')
             print(f'Uploaded {files} to {bucket_name}/weights')
-            s3.upload_file(files,bucket_name,f'./weights/{files}')
+        else:
+            s3.upload_file(files,bucket_name,files)
+            print(f'Uploaded {files} to {bucket_name}')
     
     
 
