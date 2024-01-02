@@ -89,5 +89,10 @@ def main():
     predicted_val = scaler_y.inverse_transform(predictions[0].reshape(-1,1))[0][0]
     print(f'Actual: {actual_val}, Predicted: {predicted_val}')
 
+    # Saving the model
+    model.save('serial_model.h5')
+    s3.upload_file('serial_model.h5',bucket_name,'serial_model.h5')
+    print(f'Uploaded serial model to {bucket_name}') 
+
 main()
 print('Model has been trained!')
